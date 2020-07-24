@@ -1,5 +1,8 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#define ARRAY_LEN(xs) (sizeof(xs) / sizeof(xs[0]))
 
 typedef enum {
     DED = 0,
@@ -13,10 +16,30 @@ typedef struct {
     Cell cells[HEIGHT][WIDTH];
 } Board;
 
+typedef struct {
+    int y, x;
+} Coord;
+
+void println_coord(Coord coord)
+{
+    printf("(%d, %d)\n", coord.y, coord.x);
+}
+
 int modi(int x, int y)
 {
     return (x % y + y) % y;
 }
+
+static Coord neighbor_index_dirs[8] = {
+    {-1, -1},
+    {-1, 0},
+    {-1, 1},
+    {0, -1},
+    {0, 1},
+    {1, -1},
+    {1, 0},
+    {1, 1}
+};
 
 void board_display(const Board *board, FILE *stream)
 {
@@ -51,11 +74,28 @@ void board_next_gen(const Board *prev, Board *next)
             int neighbors = board_neighbors(prev, y, x);
             if (prev->cells[y][x] == ALIVE) {
                 next->cells[y][x] = neighbors == 2 || neighbors == 3 ? ALIVE : DED;
-            } else {
+            } else {                // DED
                 next->cells[y][x] = neighbors == 3 ? ALIVE : DED;
             }
         }
     }
+}
+
+void board_prev_cell(const Board *next, Board *prev, int y, int x)
+{
+    assert(next->cells[y][x] == ALIVE);
+    prev->cells[y][x] = DED;
+#define N ARRAY_LEN(neighbor_index_dirs)
+    for (int i = 0; i < N; ++i) {
+        for (int j = i + 1; j < N; ++j) {
+            for (int k = j + 1; k < N; ++k) {
+                // TODO: it's probably looks like an algorithm that computes the binomial coeficient
+                // https://cp-algorithms.com/combinatorics/binomial-coefficients.html
+                // https://en.wikipedia.org/wiki/Binomial_coefficient
+            }
+        }
+    }
+#undef N
 }
 
 Board board[2] = {
@@ -73,6 +113,12 @@ Board board[2] = {
 
 int main(int argc, char *argv[])
 {
+    generate_neighbor_index_dirs();
+    for (int i = 0; i < ARRAY_LEN(neighbor_index_dirs); ++i) {
+        println_coord(neighbor_index_dirs[i]);
+    }
+
+#if 0
     int fb = 0;
     board_display(&board[fb], stdout);
     fputs("------------------------------\n", stdout);
@@ -86,6 +132,11 @@ int main(int argc, char *argv[])
         board_display(&board[fb], stdout);
         fputs("------------------------------\n", stdout);
     }
+#endif
 
     return 0;
 }
+
+// 0  1 2
+// 0 -1 1
+// index = 0 + 1
