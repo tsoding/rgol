@@ -2,7 +2,14 @@
 #include <stdlib.h>
 #include <GLFW/glfw3.h>
 
+#include <unistd.h>
+
 #define USE_GLFW 1
+
+void platform_sleep(int millis)
+{
+    usleep(millis * 1000);
+}
 
 typedef enum {
     DED = 0,
@@ -56,8 +63,8 @@ void board_display_glfw(const Board *board)
     for (int y = 0; y < HEIGHT; ++y) {
         for (int x = 0; x < WIDTH; ++x) {
             if(board->cells[y][x] == ALIVE) {
-              float size_x = (1.9f)/WIDTH; 
-              float size_y = (1.9f)/WIDTH; 
+              float size_x = (1.9f)/WIDTH;
+              float size_y = (1.9f)/WIDTH;
               float top_left_x = (float)(x*2)/WIDTH - 1.0f;
               float top_left_y = -((float)(y*2)/WIDTH - 1.0f);
               glVertex3f(top_left_x, top_left_y, 0.0f);
@@ -155,7 +162,7 @@ int main(int argc, char *argv[])
         board_display_glfw(&board[fb]);
         while (1) {
           glfwPollEvents();
-          usleep(10000);
+          platform_sleep(10);
           if(to_update_state == 1) {
             to_update_state = 0;
             break;
