@@ -2,6 +2,7 @@
 #define RGOL_H_
 
 #include <stdint.h>
+#include <string.h>
 
 #define WIDTH 5
 #define HEIGHT 5
@@ -125,7 +126,7 @@ void board_next_gen(const Board *prev, Board *next)
 
 typedef uint8_t Nbor_Mask;
 
-const uint8_t nbor_masks[] = {
+const uint8_t nbor3_masks[] = {
     7, 11, 19, 35, 67, 131, 13, 21, 37, 69, 133, 25, 41,
     73, 137, 49, 81, 145, 97, 161, 193, 14, 22, 38, 70,
     134, 26, 42, 74, 138, 50, 82, 146, 98, 162, 194, 28,
@@ -137,12 +138,11 @@ void board_apply_nbor_mask(Board *board,
                            Nbor_Mask mask,
                            Coord coord)
 {
-    for (int i = 7; i >= 0; --i) {
+    for (int i = 0; i < NBORS; ++i) {
         board_update_cell(
             board,
             coord_add(coord, nbor_dirs[i]),
-            (mask & 1) ? ALIVE : DED);
-        mask >>= 1;
+            (mask & (1 << i)) ? ALIVE : DED);
     }
 }
 
