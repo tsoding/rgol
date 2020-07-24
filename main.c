@@ -146,18 +146,10 @@ void init_glfw() {
 
 int main(int argc, char *argv[])
 {
+#ifdef USE_GLFW
     init_glfw();
-    #ifdef USE_GLFW
     board_display_glfw(&board[fb]);
-    #else
-    board_display(&board[fb], stdout);
-    fputs("------------------------------\n", stdout);
-    #endif
-
-#define GLIDER_CYCLES 4
-#define STEPS (GLIDER_CYCLES * 5)
-    for (int i = 0; i < STEPS; ++i) {
-        #ifdef USE_GLFW
+    while (!glfwWindowShouldClose(window)) {
         int bb = 1 - fb;
         board_display_glfw(&board[fb]);
         while (1) {
@@ -170,15 +162,22 @@ int main(int argc, char *argv[])
         }
         board_next_gen(&board[fb], &board[bb]);
         fb = bb;
-        #else
+    }
+    terminate_glfw();
+#else
+#define GLIDER_CYCLES 4
+#define STEPS (GLIDER_CYCLES * 5)
+    board_display(&board[fb], stdout);
+    fputs("------------------------------\n", stdout);
+
+    for (int i = 0; i < STEPS; ++i) {
         int bb = 1 - fb;
         board_next_gen(&board[fb], &board[bb]);
         fb = bb;
         board_display(&board[fb], stdout);
         fputs("------------------------------\n", stdout);
-        #endif
     }
+#endif
 
-    terminate_glfw();
     return 0;
 }
